@@ -1,0 +1,86 @@
+// buildscript {
+//   repositories {
+//     maven {
+//       url 'https://oss.jfrog.org/oss-snapshot-local'
+//     }
+//   }
+// }
+
+apply plugin: 'java'
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    jcenter()
+    maven {
+        url 'https://oss.jfrog.org/artifactory/oss-snapshot-local'
+    }
+}
+
+dependencies {
+    compile group: 'de.dfki.mary', name: 'marytts-common', version: '6.0.1-SNAPSHOT'
+    testCompile group: 'org.testng', name: 'testng', version: '6.8.13'
+}
+
+test {
+    useTestNG()
+
+    testLogging.showStandardStreams = true
+}
+
+
+/**********************************************************************************************
+ ** Formatting part
+***********************************************************************************************/
+task autoFormatCode() {
+    def config = new File("astyle_marytts.conf")
+    inputs.files config
+    outputs.upToDateWhen { false }
+    doLast {
+        fileTree(dir: '.' , include: '**/*.java').each { java_file ->
+            exec {
+                commandLine "astyle", "--options=$config", java_file
+            }
+        }
+    }
+}
+
+
+
+/**********************************************************************************************
+ ** Project meta + publishing part
+***********************************************************************************************/
+version '0.5-SNAPSHOT'
+group "de.dfki.mary"
+description "Tensorflow DNN support for MaryTTS"
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourceJar {
+                classifier 'sources'
+            }
+        }
+    }
+    repositories {
+        maven {
+            url "$rootProject.buildDir/repo"
+        }
+        maven {
+            url version.endsWith('-SNAPSHOT') ? 'https://oss.jfrog.org/artifactory/oss-snapshot-local' : 'https://api.bintray.com/maven/m2ci-msp/maven/jtgt'
+            credentials {
+                username = findProperty('bintrayUser')
+                password = findProperty('bintrayApiKey')
+            }
+        }
+    }
+}
