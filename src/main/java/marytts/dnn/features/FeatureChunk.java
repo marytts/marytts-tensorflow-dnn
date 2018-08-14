@@ -43,8 +43,17 @@ public class FeatureChunk extends DoubleMatrixItem {
         long[] shape = data.shape();
         assert shape.length == 2;
 
+        // FIXME: something more efficient should exists !
+        float[][] vector_tmp = new float[(int) shape[0]][(int) shape[1]];
+        data.copyTo(vector_tmp);
+
         double[][] vector = new double[(int) shape[0]][(int) shape[1]];
-        data.copyTo(vector);
+        for (int t=0; t<vector.length; t++)
+            for (int i=0; i<vector[0].length; i++)
+                vector[t][i] = vector_tmp[t][i];
+
+
+
         setValues(new DenseDoubleMatrix2D(vector));
     }
 
