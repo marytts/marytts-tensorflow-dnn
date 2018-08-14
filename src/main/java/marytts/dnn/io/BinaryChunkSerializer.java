@@ -1,50 +1,56 @@
 package marytts.dnn.io;
 
-import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
+import java.nio.ByteBuffer;
+import marytts.io.serializer.Serializer;
 import marytts.data.Sequence;
+
 import marytts.data.SupportedSequenceType;
 import marytts.data.Utterance;
 import marytts.dnn.features.FeatureChunk;
 import marytts.io.MaryIOException;
-import marytts.io.serializer.Serializer;
 
 /**
- * Feature serializer to generate TSV format output. There is not import from it
+ * Serializer to generate a binary (bytebuffer) representation of a given sequence
  *
- * @author <a href="mailto:slemaguer@coli.uni-saarland.de">Sébastien Le
- *         Maguer</a>
+ * The sequence should be a sequence of FeatureChunk
+ *
+ * @author <a href="mailto:slemaguer@coli.uni-saarland.de">Sébastien Le Maguer</a>
  */
 public class BinaryChunkSerializer implements Serializer {
 
+    /** The label of the selected sequence */
     private String selected_sequence;
 
+    /** The default precision constant */
+    private static final String DEFAULT_PRECISION = "double";
+
+    /** The output precision */
+    private String precision;
+
+    /** The default endianness constant */
+    private static final String DEFAULT_ENDIANNESS = "big";
+
+    /** The output endianness */
+    private String endianness;
+
     /**
-     * Constructor
+     * Default Constructor
      *
      */
     public BinaryChunkSerializer() {
 	setSelectedSequence(SupportedSequenceType.NORMALISED_FEATURES);
+        setPrecision(DEFAULT_PRECISION);
+        setEndianness(DEFAULT_ENDIANNESS);
     }
-
-    public String getSelectedSequence() {
-	return selected_sequence;
-    }
-
-    public void setSelectedSequence(String selected_sequence) {
-	this.selected_sequence = selected_sequence;
-    }
-
 
     /**
-     * Generate the TSV output from the utterance. Only the feature sequence is
-     * used !
+     * Export the selected sequence from the given utterance to a byte biffer
      *
-     * @param utt
-     *            the utterance containing the feature sequence
-     * @return the TSV formatted feature sequence
-     * @throws MaryIOException
-     *             if anything is going wrong
+     * @param utt the utterance containing the feature sequence
+     * @return the ByteBuffer filled with the values of the sequence
+     * @throws MaryIOException  if anything is going wrong
      */
     public Object export(Utterance utt) throws MaryIOException {
         if (!utt.hasSequence(getSelectedSequence())) {
@@ -52,25 +58,119 @@ public class BinaryChunkSerializer implements Serializer {
                                       null);
         }
 
+        if ((!getPrecision().equals("float")) && (!getPrecision().equals("double"))) {
+            throw new MaryIOException("precision should be the string \"float\" or \"double\"");
+        }
+
+        if ((!getEndianness().equals("little")) && (!getEndianness().equals("big"))) {
+            throw new MaryIOException("endianness should be the string \"little\" or \"big\"");
+        }
+
+        int nb_bytes = Double.BYTES;
+        if (getPrecision().equals("float")) {
+           nb_bytes = Float.BYTES;
+        }
+
 	// Compute size
 	int size = 0;
 	for (FeatureChunk chunk: (Sequence<FeatureChunk>) utt.getSequence(selected_sequence)) {
-	    size += chunk.getValues().size() * Double.BYTES;
+	    size += chunk.getValues().size() * nb_bytes;
 	}
 
 	// Copy data information
 	ByteBuffer dst = ByteBuffer.allocate(size);
-	for (FeatureChunk chunk: (Sequence<FeatureChunk>) utt.getSequence(selected_sequence)) {
-            double[][] ar = chunk.getValues().toArray();
-            for (int i=0; i<ar.length; i++)
-            dst.asDoubleBuffer().put(ar[i]);
-	}
+        if (getEndianness().equals("little"))
+            dst.order(ByteOrder.LITTLE_ENDIAN);
+
+        if (getPrecision().equals("double")) {
+            for (FeatureChunk chunk: (Sequence<FeatureChunk>) utt.getSequence(selected_sequence)) {
+                double[][] ar = chunk.getValues().toArray();
+                for (int t=0; t<ar.length; t++)
+                    for (int i=0; i<ar[t].length; i++)
+                        dst.putDouble(ar[t][i]);
+            }
+        } else if (getPrecision().equals("float")) {
+            for (FeatureChunk chunk: (Sequence<FeatureChunk>) utt.getSequence(selected_sequence)) {
+                double[][] ar = chunk.getValues().toArray();
+                for (int t=0; t<ar.length; t++)
+                    for (int i=0; i<ar[t].length; i++)
+                        dst.putFloat((float) ar[t][i]);
+            }
+        }
 
 	// Flip buffer to be able to validate header
 	dst.flip();
 
 	return dst; // Double check !
     }
+
+
+    /**
+     *  Getter of the label of the used sequence
+     *
+     *  @return the used sequence label
+     */
+    public String getSelectedSequence() {
+	return selected_sequence;
+    }
+
+    /**
+     *  Setter of the label of the used sequence
+     *
+     *  @param selected_sequence the used sequence label
+     */
+    public void setSelectedSequence(String selected_sequence) {
+	this.selected_sequence = selected_sequence;
+    }
+
+
+
+    /**
+     *  Setter of the precision.
+     *
+     *  @param precision the new precision (should be "float" or "double")
+     *  @throws IllegalArgumentException if the parameter value is neither "float" nor "double"
+     */
+    public void setPrecision(String precision) {
+        if ((!precision.equals("float")) && (!precision.equals("double"))) {
+            throw new IllegalArgumentException("precision should be the string \"float\" or \"double\"");
+        }
+
+        this.precision = precision;
+    }
+
+    /**
+     *  Getter of the precision
+     *
+     *  @return the used precision
+     */
+    public String getPrecision() {
+        return precision;
+    }
+
+    /**
+     *  Getter of the endianness
+     *
+     *  @return the used endianness
+     */
+    public String getEndianness() {
+        return endianness;
+    }
+
+    /**
+     *  Setter of the endianness.
+     *
+     *  @param endianness the new endianness (should be "little" or "big")
+     *  @throws IllegalArgumentException if the parameter value is neither "little" nor "big"
+     */
+    public void setEndianness(String endianness) {
+        if ((!endianness.equals("little")) && (!endianness.equals("big"))) {
+            throw new IllegalArgumentException("endianness should be the string \"little\" or \"big\"");
+        }
+
+        this.endianness = endianness;
+    }
+
 
     /**
      * Unsupported operation ! We can't import from a TSV formatted input.
