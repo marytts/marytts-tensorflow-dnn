@@ -1,35 +1,21 @@
 package marytts.dnn.modules;
 
-import marytts.MaryException;
-
-// Reflection
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 
-// Configuration
-import marytts.config.MaryConfiguration;
-import marytts.exceptions.MaryConfigurationException;
-
-// Module
-import marytts.modules.MaryModule;
-
-// DNN part
-import marytts.dnn.FeatureNormaliser;
-import marytts.dnn.normaliser.*;
 import org.tensorflow.Tensor;
 
-// IO
-import marytts.io.MaryIOException;
-import java.io.InputStream;
-
-// Data
-import marytts.features.FeatureMap;
-import marytts.dnn.features.FeatureChunk;
-import marytts.data.Utterance;
+import marytts.MaryException;
+import marytts.config.MaryConfiguration;
 import marytts.data.Sequence;
 import marytts.data.SupportedSequenceType;
-
-// Utils
-import java.util.ArrayList;
+import marytts.data.Utterance;
+import marytts.dnn.FeatureNormaliser;
+import marytts.dnn.features.FeatureChunk;
+import marytts.exceptions.MaryConfigurationException;
+import marytts.features.FeatureMap;
+import marytts.io.MaryIOException;
+import marytts.modules.MaryModule;
 
 /**
  *  Feature normalisation module used to generate binary input vectors for the DNN prediction module
