@@ -11,6 +11,7 @@ import marytts.data.Sequence;
 import marytts.data.SupportedSequenceType;
 import marytts.data.Utterance;
 import marytts.dnn.FeatureNormaliser;
+import marytts.dnn.TensorflowSupportedSequenceType;
 import marytts.dnn.features.FeatureChunk;
 import marytts.exceptions.MaryConfigurationException;
 import marytts.features.FeatureMap;
@@ -44,7 +45,7 @@ public class FeatureNormalisation extends MaryModule
     public FeatureNormalisation()
     {
 	super("normalisation");
-	this.output_sequence_type = SupportedSequenceType.NORMALISED_FEATURES;
+	this.output_sequence_type = TensorflowSupportedSequenceType.NORMALISED_FEATURES;
 	this.normaliser = null;
         this.normaliser_input_path = null;
         this.normaliser_input_stream = null;

@@ -4,6 +4,7 @@ package marytts.dnn.io;
 import marytts.data.Sequence;
 import marytts.data.SupportedSequenceType;
 import marytts.data.Utterance;
+import marytts.dnn.TensorflowSupportedSequenceType;
 import marytts.dnn.features.FeatureChunk;
 import marytts.io.MaryIOException;
 import marytts.io.serializer.Serializer;
@@ -23,7 +24,7 @@ public class DebugBinaryChunkSerializer implements Serializer {
      *
      */
     public DebugBinaryChunkSerializer() {
-	setSelectedSequence(SupportedSequenceType.NORMALISED_FEATURES);
+	setSelectedSequence(TensorflowSupportedSequenceType.NORMALISED_FEATURES);
     }
 
     public String getSelectedSequence() {
