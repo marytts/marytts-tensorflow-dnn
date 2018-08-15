@@ -19,10 +19,13 @@ repositories {
     maven {
         url 'https://oss.jfrog.org/artifactory/oss-snapshot-local'
     }
+    maven {
+        url 'https://oss.jfrog.org/artifactory/oss-release-local'
+    }
 }
 
 dependencies {
-    compile group: 'de.dfki.mary', name: 'marytts-common', version: '6.0.1-SNAPSHOT'
+    compile group: 'de.dfki.mary', name: 'marytts-common', version: '6.0.1-ALPHA2'
     compile group: 'org.tensorflow', name: 'tensorflow', version: '1.5.0-rc1'
     testCompile group: 'org.assertj', name:'assertj-core', version: '3.10.0'
     testCompile group: 'org.testng', name: 'testng', version: '6.8.13'
