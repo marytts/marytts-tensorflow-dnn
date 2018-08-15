@@ -7,17 +7,31 @@ branches:
 matrix:
   include:
     - os: linux
+      dist: trusty
       jdk: openjdk8
     - os: osx
 
+# Installation of "modern compiler" package
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - libstdc++-6-dev
+      - libc++abi-dev
+      - libc6
+
 # Java specific
 language: java
-scripts: ./gradlew b --info
+install: ./gradlew assemble --stacktrace --info
+script:
+  - ./gradlew check --stacktrace --info
 
 # Caching
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
 cache:
   directories:
     - $HOME/.gradle/caches/
