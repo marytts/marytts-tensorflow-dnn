@@ -8,6 +8,7 @@ matrix:
   include:
     - os: linux
       dist: trusty
+      sudo: required
       jdk: openjdk8
     - os: osx
 
@@ -23,7 +24,8 @@ addons:
 
 # Java specific
 language: java
-install: ./gradlew assemble --stacktrace --info
+install:
+  - ./gradlew assemble --stacktrace --info
 script:
   - ./gradlew check --stacktrace --info
 
