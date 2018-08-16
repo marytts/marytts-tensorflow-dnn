@@ -59,7 +59,7 @@ task autoFormatCode() {
 /**********************************************************************************************
  ** Project meta + publishing part
 ***********************************************************************************************/
-version '0.5'
+version '0.6-SNAPSHOT'
 group "de.dfki.mary"
 description "Tensorflow DNN support for MaryTTS"
 
