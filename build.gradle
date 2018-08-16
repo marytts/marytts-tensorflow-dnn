@@ -59,7 +59,7 @@ task autoFormatCode() {
 /**********************************************************************************************
  ** Project meta + publishing part
 ***********************************************************************************************/
-version '0.5-SNAPSHOT'
+version '0.5'
 group "de.dfki.mary"
 description "Tensorflow DNN support for MaryTTS"
 
@@ -81,7 +81,7 @@ publishing {
             url "$rootProject.buildDir/repo"
         }
         maven {
-            url version.endsWith('-SNAPSHOT') ? 'https://oss.jfrog.org/artifactory/oss-snapshot-local' : 'https://api.bintray.com/maven/m2ci-msp/maven/jtgt'
+            url version.endsWith('-SNAPSHOT') ? 'https://oss.jfrog.org/artifactory/oss-snapshot-local' : 'https://oss.jfrog.org/artifactory/oss-release-local'
             credentials {
                 username = findProperty('bintrayUser')
                 password = findProperty('bintrayApiKey')
