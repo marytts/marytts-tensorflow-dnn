@@ -26,7 +26,7 @@ repositories {
 
 dependencies {
     compile group: 'de.dfki.mary', name: 'marytts-common', version: '6.0.1-ALPHA2'
-    compile group: 'org.tensorflow', name: 'tensorflow', version: '1.5.0-rc1'
+    compile group: 'org.tensorflow', name: 'tensorflow', version: '1.8.0'
     testCompile group: 'org.assertj', name:'assertj-core', version: '3.10.0'
     testCompile group: 'org.testng', name: 'testng', version: '6.8.13'
 }
